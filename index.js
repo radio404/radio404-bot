@@ -48,9 +48,10 @@ async function LogCurrentTrack(data){
             'Accept': 'application/json'
         }
     }).then(response=>{
-        console.log(response.data);
+        return true;
     }).catch(err=>{
         console.log(`${err.message} -- ${process.env.WP_RK_LOG_TRACK_URL}`);
+        return false;
     })
 }
 
