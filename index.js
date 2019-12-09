@@ -15,6 +15,7 @@ function UpdateCurrentTrack(){
 
                 delay = Math.max(process.env.RK_TIMEOUT_MIN || 5000, next_track_delay + parseInt(process.env.RK_TIMEOUT_OFFSET || 10000));
                 if (data.id !== currentTrackId) {
+                    currentTrackId = data.id;
                     LogCurrentTrack(data)
                 }
             }catch(err){
