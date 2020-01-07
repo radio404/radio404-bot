@@ -1,13 +1,18 @@
 require('dotenv').config();
 const axios = require('axios');
-
+const DEFAULT_UPDATE_DELAY = process.env.DEFAULT_UPDATE_DELAY || 30000;
 
 let currentTrackId;
 
+function Log(message){
+    const date = new Date();
+    console.log(`${date.toISOString()} | ${message}`);
+}
+
 function UpdateCurrentTrack(){
-    axios.get(process.env.RK_CURRENT_TRACK_URL)
+    return axios.get(process.env.RK_CURRENT_TRACK_URL)
         .then(response=>{
-            let delay = 30000
+            let delay = DEFAULT_UPDATE_DELAY
             try {
                 const data = response.data,
                     next_track = new Date(response.data.next_track),
@@ -19,41 +24,30 @@ function UpdateCurrentTrack(){
                     LogCurrentTrack(data)
                 }
             }catch(err){
-                console.log(err);
+                Log(`Fail to log current track. ${err.message}`);
             }
             setTimeout(UpdateCurrentTrack,delay);
+        }).catch(err=>{
+            Log(`Fail to get current track info. ${err.message}`);
+            setTimeout(UpdateCurrentTrack,DEFAULT_UPDATE_DELAY);
         })
 }
 
-async function getWpToken(){
-    return await axios.post(process.env.WP_AUTH_URL,{
-        'username':process.env.WP_USERNAME,
-        'password':process.env.WP_PASSWORD
-    },{
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        }
-    }).then(response=>{
-        const {token} = response.data;
-        return token;
-    });
-}
-
 async function LogCurrentTrack(data){
-    const token = await getWpToken();
-    //console.log(data);
+    data.passphrase = process.env.WP_RK_LOG_TRACK_PASSPHRASE;
     return await axios.post(process.env.WP_RK_LOG_TRACK_URL,data,{
         headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
         }
     }).then(response=>{
+        Log(`Log current track success. ${data.id} >> ${data.title} >> ${data.artist}`);
         return true;
     }).catch(err=>{
-        console.log(`${err.message} -- ${process.env.WP_RK_LOG_TRACK_URL}`);
+        Log(`Fail to log current track. ${err.message}`);
         return false;
     })
 }
 
 UpdateCurrentTrack();
+Log('Service started.');
