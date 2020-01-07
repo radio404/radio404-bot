@@ -41,7 +41,14 @@ async function LogCurrentTrack(data){
             'Accept': 'application/json'
         }
     }).then(response=>{
-        Log(`Log current track success. ${data.id} >> ${data.title} >> ${data.artist}`);
+        if(response.data.success){
+            Log(`Log current track success. ${data.id} >> ${data.title} >> ${data.artist}`);
+        }else if(response.data.error){
+            Log(`Log current track error. ${data.id} >> ${response.data.error}`);
+        }else{
+            Log(`Log current track fatal error. ${data.id}`);
+        }
+
         return true;
     }).catch(err=>{
         Log(`Fail to log current track. ${err.message}`);
