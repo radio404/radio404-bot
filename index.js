@@ -24,7 +24,7 @@ function UpdateCurrentTrack(){
                     LogCurrentTrack(data)
                 }
             }catch(err){
-                Log(`Fail to log current track. ${err.message}`);
+                Log(`Fail to Update current track. ${err.message}`);
             }
             setTimeout(UpdateCurrentTrack,delay);
         }).catch(err=>{
